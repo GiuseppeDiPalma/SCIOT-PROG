@@ -1,0 +1,19 @@
+apiVersion: "nuclio.io/v1"
+kind: Function
+metadata:
+  name: mqttrandomtemperature
+  namespace: nuclio
+spec:
+  handler: "main:handler"
+  description: "Function to generate an event on the MQTT queue sending a temperature value."
+  runtime: nodejs
+  image: "nuclio/processor-mqtt-random-temperature:latest"
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPU: 75
+  build:
+    functionSourceCode: dmFyIG1xdHQgPSByZXF1aXJlKCdtcXR0JyksIHVybCA9IHJlcXVpcmUoJ3VybCcpOwoKdmFyIG1xdHRfdXJsID0gdXJsLnBhcnNlKHByb2Nlc3MuZW52LkNMT1VEQU1RUF9NUVRUX1VSTCB8fCAnbXF0dDovL2d1ZXN0Omd1ZXN0QDE5Mi4xNjguMTkuMTUxOjE4ODMnKTsKdmFyIGF1dGggPSAobXF0dF91cmwuYXV0aCB8fCAnOicpLnNwbGl0KCc6Jyk7CnZhciB1cmwgPSAibXF0dDovLyIgKyBtcXR0X3VybC5ob3N0OwoKdmFyIG9wdGlvbnMgPSB7CiAgcG9ydDogbXF0dF91cmwucG9ydCwKICBjbGllbnRJZDogJ21xdHRqc18nICsgTWF0aC5yYW5kb20oKS50b1N0cmluZygxNikuc3Vic3RyKDIsIDgpLAogIHVzZXJuYW1lOiBhdXRoWzBdLAogIHBhc3N3b3JkOiBhdXRoWzFdLAp9OwoKZXhwb3J0cy5oYW5kbGVyID0gZnVuY3Rpb24oY29udGV4dCwgZXZlbnQpIHsKICAgIHZhciBjbGllbnQgPSBtcXR0LmNvbm5lY3QodXJsLCBvcHRpb25zKTsKICAgIAogICAgY2xpZW50Lm9uKCdjb25uZWN0JywgZnVuY3Rpb24oKSB7CiAgICAgICAgY2xpZW50LnB1Ymxpc2goJ2lvdC9zZW5zb3JzL3RlbXBlcmF0dXJlJywgKE1hdGguZmxvb3IoTWF0aC5yYW5kb20oKSozMCkpLnRvU3RyaW5nKCksIGZ1bmN0aW9uKCkgewogICAgICAgICAgICAgICAgICAgIGNsaWVudC5lbmQoKTsgCiAgICAgICAgICAgICAgICAgICAgY29udGV4dC5jYWxsYmFjaygnTVFUVCBNZXNzYWdlIFNlbnQnKTsKICAgICAgICAgICAgICAgIH0gKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgIH0pOyAgICAgICAgCiAgICAKfTs=
+    commands:
+      - 'npm install mqtt'
+    codeEntryType: sourceCode
+  platform: {}

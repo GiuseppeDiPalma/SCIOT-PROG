@@ -1,0 +1,27 @@
+apiVersion: "nuclio.io/v1"
+kind: Function
+metadata:
+  name: mqttconsume
+  namespace: nuclio
+spec:
+  handler: "main:handler"
+  description: "Function the is called when a new message is arrived on the iot/sensors/temperature queue, //the function send back a feedback on the iot/logs queue."
+  runtime: nodejs
+  image: "nuclio/processor-mqttconsume:latest"
+  minReplicas: 1
+  maxReplicas: 1
+  targetCPU: 75
+  triggers:
+    myMqttTrigger:
+      kind: "mqtt"
+      url: "guest:guest@192.168.19.151:1883"
+      attributes:
+        subscriptions:
+          - topic: iot/sensors/temperature
+            qos: 0
+  build:
+    functionSourceCode: dmFyIGFtcXAgPSByZXF1aXJlKCdhbXFwbGliJyk7CiAgICAgICAgdmFyIEZVTkNUSU9OX05BTUUgPSAibXF0dGNvbnN1bWUiOwogICAgICAgIGZ1bmN0aW9uIHNlbmRfZmVlZGJhY2sobXNnKXsKICAgICAgICAgICAgdmFyIHEgPSAnaW90L2xvZ3MnOwogICAgICAgICAgICBhbXFwLmNvbm5lY3QoJ2FtcXA6Ly9ndWVzdDpndWVzdEAxOTIuMTY4LjE5LjE1MTo1NjcyJykudGhlbihmdW5jdGlvbihjb25uKSB7CiAgICAgICAgICAgICAgICByZXR1cm4gY29ubi5jcmVhdGVDaGFubmVsKCkudGhlbihmdW5jdGlvbihjaCkgewogICAgICAgICAgICAgICAgICAgIHZhciBvayA9IGNoLmFzc2VydFF1ZXVlKHEsIHtkdXJhYmxlOiBmYWxzZX0pOwogICAgICAgICAgICAgICAgICAgIHJldHVybiBvay50aGVuKGZ1bmN0aW9uKF9xb2spIHsKICAgICAgICAgICAgICAgICAgICBjaC5zZW5kVG9RdWV1ZShxLCBCdWZmZXIuZnJvbShtc2cpKTsKICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmxvZygiIFt4XSBTZW50ICclcyciLCBtc2cpOwogICAgICAgICAgICAgICAgICAgIHJldHVybiBjaC5jbG9zZSgpOwogICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgfSkuZmluYWxseShmdW5jdGlvbigpIHsgCiAgICAgICAgICAgICAgICAgICAgICAgIGNvbm4uY2xvc2UoKTsKICAgICAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgfSkuY2F0Y2goY29uc29sZS53YXJuKTsKICAgICAgICB9CgogICAgICAgIGZ1bmN0aW9uIGJpbjJzdHJpbmcoYXJyYXkpewogICAgICAgICAgdmFyIHJlc3VsdCA9ICIiOwogICAgICAgICAgZm9yKHZhciBpID0gMDsgaSA8IGFycmF5Lmxlbmd0aDsgKytpKXsKICAgICAgICAgICAgcmVzdWx0Kz0gKFN0cmluZy5mcm9tQ2hhckNvZGUoYXJyYXlbaV0pKTsKICAgICAgICAgIH0KICAgICAgICAgIHJldHVybiByZXN1bHQ7CiAgICAgICAgfQoKICAgICAgICBleHBvcnRzLmhhbmRsZXIgPSBmdW5jdGlvbihjb250ZXh0LCBldmVudCkgewogICAgICAgICAgICB2YXIgX2V2ZW50ID0gSlNPTi5wYXJzZShKU09OLnN0cmluZ2lmeShldmVudCkpOwogICAgICAgICAgICB2YXIgX2RhdGEgPSBiaW4yc3RyaW5nKF9ldmVudC5ib2R5LmRhdGEpOwoKICAgICAgICAgICAgY29udGV4dC5jYWxsYmFjaygiZmVlZGJhY2sgIitfZGF0YSk7CgogICAgICAgICAgICBjb25zb2xlLmxvZygiVFJJR0dFUiAiK19kYXRhKTsKICAgICAgICAgICAgc2VuZF9mZWVkYmFjaygiSW52b2tlZCBGdW5jdGlvbiBNUVRUOiAiK0ZVTkNUSU9OX05BTUUrIiByZWNlaXZlZCAiK19kYXRhKTsKICAgICAgICB9Ow==
+    commands:
+      - "npm install amqplib"
+    codeEntryType: sourceCode
+  platform: {}
