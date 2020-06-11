@@ -8,7 +8,7 @@
 
 ---
 
-#### Explication  \
+#### Explication  
 
 ![GreenHouse](PROPOSAL/img/greenhouse.png){width=50% height=50%}
 
@@ -39,7 +39,7 @@ I get this information from sites with true and real data.
 
 <div style="page-break-after: always;"></div>
 
-#### Infrastructure  \
+#### Infrastructure
 
 This is my idea of infrastructure that I imagined, surely I will be forced to change it in the development phase.
 
