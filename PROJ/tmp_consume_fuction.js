@@ -3,7 +3,7 @@ var amqp = require('amqplib');
         function send_feedback(msg){
             var q = 'iot/logs';
             amqp.connect('amqp://guest:guest@192.168.19.151:5672').then(function(conn) {
-                return conn.createChannel().then(function(ch) {
+                return conn.createChannel().then(function(ch) { 
                     var ok = ch.assertQueue(q, {durable: false});
                     return ok.then(function(_qok) {
                     ch.sendToQueue(q, Buffer.from(msg));
