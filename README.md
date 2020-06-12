@@ -1,7 +1,6 @@
 # Domotic Garden - The garden for everyone
 
-**Professor:** Vittorio Scarano
-
+**Professor:** Vittorio Scarano \
 **Exam:** Serverless Computing for IoT
 
 ## Explication  
