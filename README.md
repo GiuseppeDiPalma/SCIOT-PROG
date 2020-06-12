@@ -6,7 +6,9 @@
 
 ## Explication  
 
-<img align="center" src="PROPOSAL/img/greenhouse.png" width=200/>
+<p align="center">
+    <img src="PROPOSAL/img/greenhouse.png" width=200/>
+</p>
 
 I have always tried to grow plants(chili, salad, basil etc..) over the years.
 I have noticed that this idea is very difficult to realize, for various reasons: little space, little green thumb, but
@@ -37,4 +39,6 @@ I get this information from sites with true and real data.
 
 This is my idea of infrastructure that I imagined, surely I will be forced to change it in the development phase.
 
-<img align="center" src="PROPOSAL/img/infrastructure.png" width=400/>
+<p align="center">
+    <img align="center" src="PROPOSAL/img/infrastructure.png" width=400/>
+</p>
