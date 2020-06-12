@@ -1,17 +1,10 @@
-# Domotic Garden
+# Domotic Garden - The garden for everyone
 
-## The garden for everyone
+**Professor:** Vittorio Scarano
+**Exam:** Serverless Computing for IoT
 
-### _**Serverless Computing for IoT**_
-
-### _**Professor Vittorio Scarano**_
-
-
----
-
-#### Explication  
-
-![GreenHouse](PROPOSAL/img/greenhouse.png){width=50% height=50%}
+## Explication  
+![GreenHouse](PROPOSAL/img/greenhouse.png =250x250)
 
 I have always tried to grow plants(chili, salad, basil etc..) over the years.
 I have noticed that this idea is very difficult to realize, for various reasons: little space, little green thumb, but
@@ -38,10 +31,8 @@ These sensors are activated with a precise purpose, based on certain information
 about growing potted plants.
 I get this information from sites with true and real data.
 
-<div style="page-break-after: always;"></div>
-
-#### Infrastructure
+## Infrastructure
 
 This is my idea of infrastructure that I imagined, surely I will be forced to change it in the development phase.
 
-![Infrastructure](PROPOSAL/img/infrastructure.png){width=50% height=50%}
+![Infrastructure](PROPOSAL/img/infrastructure.png =250x250)
