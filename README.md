@@ -6,7 +6,7 @@
 ## Explication  
 ![GreenHouse](PROPOSAL/img/greenhouse.png =250x250)
 
-<img src="PROPOSAL/img/greenhouse.png" width="250" height="250">
+<img src="PROPOSAL/img/greenhouse.png" width=400/>
 
 I have always tried to grow plants(chili, salad, basil etc..) over the years.
 I have noticed that this idea is very difficult to realize, for various reasons: little space, little green thumb, but
