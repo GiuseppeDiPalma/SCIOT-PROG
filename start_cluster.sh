@@ -70,8 +70,7 @@ do
     echo "aws ec2 terminate-instances --instance-ids "$line >> destroy_clusterAWS.sh
 done < <( runInstance MASTER )
 
-#qui sto dicendo, di creare i restanti slave
-#che saranno numerati da 1 a n scelti dall'utente.
+#Creazione Slave_N
 echo "Starting creation of slaves!"
 for (( i=0;i<$numSlaveInstance-1;i++))
 do
@@ -91,10 +90,10 @@ done
 echo "Sleep 30 seconds  to wait for the creation of the vm on AWS"
 sleep 30
 #Prendo Indirizzo Pubblico e Privato del master 
-echo "Add Public IP of master in hostfile"
+echo "Extract Public IP of master for first connection"
 masterPublicIp=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${ID_vm[0]}" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
-echo "IP PUBBLICO MASTER: " $masterPublicIp
-echo $masterPublicIp"       master">> hostfile
+#echo "IP PUBBLICO MASTER: " $masterPublicIp
+#echo $masterPublicIp"       master">> hostfile
 
 #Prendo Indirizzo Privato degli slave
 echo "Add Private IP of slaves in hostfile"
@@ -103,7 +102,8 @@ for id in "${ID_vm[@]:1}"
 do
     i=$((i+1));
     slavePrivateIp=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${id}" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text)
-    echo $slavePrivateIp"       slave_$i">> hostfile
+    #echo $slavePrivateIp"       slave_$i">> hostfile
+    echo $slavePrivateIp>> hostfile
 done
 
 echo "Generating files..."
@@ -111,11 +111,12 @@ echo "Generating files..."
 echo "git clone https://github.com/spagnuolocarmine/ubuntu-openmpi-openmp.git;
 source ubuntu-openmpi-openmp/generateInstall.sh;
 for host in \$(cat hostfile); do ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" ubuntu@\${host} \"bash -s\" < install.sh &" > configure.sh
-echo "done; bash install.sh; sudo chown pcpc:pcpc hostfile; sudo cp hostfile /home/pcpc;" >> configure.sh
+echo "done; bash install.sh; sudo chown pcpc:pcpc hostfile; sudo cp hostfile /home/pcpc; sudo chmod 600 ${keyNameSSH}.pem" >> configure.sh
 
 #This script copy all necessary files to master and connect to him with ssh
 echo "scp -i ${keyNameSSH}.pem configure.sh hostfile ${keyNameSSH}.pem ubuntu@${masterPublicIp}:;
 ssh -i ${keyNameSSH}.pem ubuntu@${masterPublicIp};" > master_connect.sh #create ssh file
 
+echo ">>>>>>>>FINISH<<<<<<<<"
 
 #quindi mi devo connettere su ogni macchina ed eseguire bash configure.sh
