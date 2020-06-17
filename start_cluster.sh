@@ -50,6 +50,7 @@ function runInstance() {
 
 #Delete previous run file
 rm hostfile &> /dev/null
+rm runFile &> /dev/null
 rm destroy_clusterAWS.sh &> /dev/null
 rm configure.sh &>/dev/null
 rm master_connect.sh  &>/dev/null
@@ -65,6 +66,13 @@ do
     echo "ID VM(master): "$line #qui tengo ID della macchina che ho appena creato del tipo esempio i-02badd859e7be7ac4"
     ID_vm+=( "${line}" )
     echo "#!/bin/bash" >> destroy_clusterAWS.sh
+    echo "
+rm hostfile &> /dev/null
+rm runFile &> /dev/null
+rm destroy_clusterAWS.sh &> /dev/null
+rm configure.sh &>/dev/null
+rm master_connect.sh  &>/dev/null
+    " > destroy_clusterAWS.sh
     echo ""
     echo "#Master" >> destroy_clusterAWS.sh
     echo "aws ec2 terminate-instances --instance-ids "$line >> destroy_clusterAWS.sh
@@ -92,6 +100,11 @@ sleep 30
 #Prendo Indirizzo Pubblico e Privato del master 
 echo "Extract Public IP of master for first connection"
 masterPublicIp=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${ID_vm[0]}" --query 'Reservations[*].Instances[*].[PublicIpAddress]' --output text)
+masterPrivateIp=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${ID_vm[0]}" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text)
+numberCoresVMMaster=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${ID_vm[0]}" --query 'Reservations[*].Instances[*].CpuOptions.CoreCount' --output text)
+echo "#master" >> runFile
+echo $masterPrivateIp" slots="$numberCoresVMMaster "max-slots="$numberCoresVMMaster >> runFile
+echo "#slave" >> runFile
 #echo "IP PUBBLICO MASTER: " $masterPublicIp
 #echo $masterPublicIp"       master">> hostfile
 
@@ -102,20 +115,26 @@ for id in "${ID_vm[@]:1}"
 do
     i=$((i+1));
     slavePrivateIp=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${id}" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' --output text)
+    numberCoresVM=$(aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" "Name=instance-id,Values=${id}" --query 'Reservations[*].Instances[*].CpuOptions.CoreCount' --output text)
     #echo $slavePrivateIp"       slave_$i">> hostfile
-    echo $slavePrivateIp>> hostfile
+    #echo "numberCoresVM:" $numberCoresVM
+    echo $slavePrivateIp" slots="$numberCoresVM "max-slots="$numberCoresVM >> runFile
+    echo $slavePrivateIp >> hostfile
+    echo 
 done
 
 echo "Generating files..."
 #This file configure and install openMPI across all machine 
-echo "git clone https://github.com/spagnuolocarmine/ubuntu-openmpi-openmp.git;
+echo "
+git clone https://github.com/spagnuolocarmine/ubuntu-openmpi-openmp.git;
 source ubuntu-openmpi-openmp/generateInstall.sh;
-for host in \$(cat hostfile); do ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" ubuntu@\${host} \"bash -s\" < install.sh &" > configure.sh
-echo "done; bash install.sh; sudo chown pcpc:pcpc hostfile; sudo cp hostfile /home/pcpc; sudo chmod 600 ${keyNameSSH}.pem" >> configure.sh
+for host in \$(cat hostfile); do ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" -o \"UserKnownHostsFile=/dev/null\"  ubuntu@\${host} \"bash -s\" 
+< install.sh &" > configure.sh
+echo "done; bash install.sh; sudo chown pcpc:pcpc hostfile; sudo cp hostfile /home/pcpc;" >> configure.sh
 
 #This script copy all necessary files to master and connect to him with ssh
 echo "scp -i ${keyNameSSH}.pem configure.sh hostfile ${keyNameSSH}.pem ubuntu@${masterPublicIp}:;
-ssh -i ${keyNameSSH}.pem ubuntu@${masterPublicIp};" > master_connect.sh #create ssh file
+ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" -o \"UserKnownHostsFile=/dev/null\" ubuntu@${masterPublicIp};" > master_connect.sh #create ssh file
 
 echo ">>>>>>>>FINISH<<<<<<<<"
 
