@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo ">>>>>>>>START<<<<<<<<"
+
+
 idImage="ami-07ebfd5b3428b6f4d"
 securityGroup="sg-083d0bc639e109568"
 instanceType="t2.micro"
@@ -8,33 +11,35 @@ subnetId="subnet-02f4dfcc170998f42"
 #nameTagSpec="$9"
 
 numSlaveInstance=$2 #number of all instances 
+fileToSend=$4
 
-echo "$numSlaveInstance VM Will be launched"
-echo "N-1 SLAVE, 1 MASTER!"
+echo "VM Will be launched: $numSlaveInstance"
+echo "File send to cluster: $fileToSend"
 
 function helpFunction()
 {
-   echo "\n"
    echo "Usage: $0"
-   echo -e "-c number of SLAVE to run;"
+   echo -e "\t-c number of SLAVE to run;"
+   echo -e "\t-f file to send to cluster;"
    exit 1 # Exit script after printing help
 }
 
-while getopts "c:" opt
+while getopts "c:f:" opt
 do
    case "$opt" in
       c ) instanceCount="$OPTARG" ;;
+      f ) fileSend="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
-
 # Print helpFunction in case parameters are empty
-if [ -z "$instanceCount" ]
+if [ -z "$instanceCount" ] || [ -z "$fileSend" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
 fi
+
 
 function runInstance() {
     aws ec2 run-instances \
@@ -54,6 +59,7 @@ rm runFile &> /dev/null
 rm destroy_clusterAWS.sh &> /dev/null
 rm configure.sh &>/dev/null
 rm master_connect.sh  &>/dev/null
+rm run_script.sh &>/dev/null
 
 declare -a ID_vm
 
@@ -72,6 +78,7 @@ rm runFile &> /dev/null
 rm destroy_clusterAWS.sh &> /dev/null
 rm configure.sh &>/dev/null
 rm master_connect.sh  &>/dev/null
+rm run_script.sh &>/dev/null
     " > destroy_clusterAWS.sh
     echo ""
     echo "#Master" >> destroy_clusterAWS.sh
@@ -133,9 +140,34 @@ for host in \$(cat hostfile); do ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChec
 echo "done; bash install.sh; sudo chown pcpc:pcpc hostfile; sudo cp hostfile /home/pcpc;" >> configure.sh
 
 #This script copy all necessary files to master and connect to him with ssh
-echo "scp -i ${keyNameSSH}.pem configure.sh hostfile ${keyNameSSH}.pem ubuntu@${masterPublicIp}:;
-ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" -o \"UserKnownHostsFile=/dev/null\" ubuntu@${masterPublicIp};" > master_connect.sh #create ssh file
+
+#echo "scp -i ${keyNameSSH}.pem configure.sh hostfile ${keyNameSSH}.pem $fileToSend ubuntu@${masterPublicIp}:;
+#ssh -i ${keyNameSSH}.pem -o \"StrictHostKeyChecking no\" -o \"UserKnownHostsFile=/dev/null\" ubuntu@${masterPublicIp};" > master_connect.sh #create ssh file
+
+
+
+#ora nella mia VM lancio master_connect.sh
+#mi porta sul master
+#poi sul master lancio configure.sh, che prima clona la repo
+#dal prof e poi generateInstall.sh sul master, che produce install.sh
+#poi sempre configure.sh il master si connette ad ogni slave e lancia il comando install.sh 
+#installando l'ambiente di pcpc su ogni slave.
+
+#ora devo scrivere il codice per mandare osu ogni nodo slave, l'eseguibile del programma.
+
+echo "
+mpicc ${fileToSend} -o outFiletoexecute
+
+for host in \$(cat hostfile); do scp -i ${keyNameSSH}.pem outFiletoexecute ubuntu@\${host}: done;
+
+" >> run_script.sh
+
+#Invio il file.c al master e poi il master manda eseguibile .out agli slave
+echo "Send $fileToSend to master"
+
+scp -i ${keyNameSSH}.pem -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null" $fileToSend configure.sh hostfile ${keyNameSSH}.pem runFile run_script.sh ubuntu@${masterPublicIp}:
+ssh -i ${keyNameSSH}.pem -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null" ubuntu@${masterPublicIp}
+
+
 
 echo ">>>>>>>>FINISH<<<<<<<<"
-
-#quindi mi devo connettere su ogni macchina ed eseguire bash configure.sh
